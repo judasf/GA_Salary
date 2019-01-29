@@ -1,0 +1,32 @@
+html, body, h1, h2, h3, h4, h5, h6, p, br, form, input, button, textarea, select, fieldset, blockquote, ul, ol, li, dl, dt, dd, pre { margin: 0; padding: 0;}
+ul, li { list-style: none; }
+#content { margin: 0 auto; color: #333; font-size: 12px; }
+table { text-align: center; }
+td { padding: 7px 2px; }
+a { text-decoration: none; color: #F98E02; }
+td a { font-weight: 700; }
+.title { text-align: center; line-height: 33px; }
+.nav  p { text-align: center; line-height: 24px; }
+.nav a { padding: 0 9px; font-size: 14px; }
+.search_td { width: 100px; text-align: right; background: #fafafa; }
+.search_btn { cursor: pointer; background: url(../images/btn_bg.gif) no-repeat; width: 100px; height: 25px; border: none; color: #fff; font-weight: 700; line-height: 25px; }
+.header { height: 54px; background-color:#417bc9; color: #FFF; font-size: 20px; font-weight: 700; line-height: 54px; padding-left: 10px; text-align: left;overflow:hidden; }
+.top { height: 40px; background-color:#7baaea;overflow:hidden; }
+.top span { float: left; margin: 0 15px; }
+.top a { color: #fff; font-weight: 700; text-decoration: none; font-size: 14px; }
+.current { height: 25px; width: 120px; background: url(../images/l_bg.gif) no-repeat; display: block; }
+.top .current a { color: #666; }
+.top ul { padding-top: 10px; }
+.top ul li { float: left; margin: 0 15px; line-height: 26px; text-align: center; }
+.h_title { text-align: left; padding-left: 13px; font-weight: 700; background: url(../images/vl.gif) no-repeat 5px 9px #f5f5f5; line-height:20px;}
+.clearboth { clear: both; }
+.tdinput { text-align: left; }
+/*login*/
+.login { background: url(../images/bodybg.gif) repeat-x; }
+.f_login_bg { background: url(../images/signBar.gif); height: 230px; width: 100%; z-index: 2; left: 0; margin-top: -125px; position: absolute; top: 50%; }
+.f_login { background: url("../images/signbox.gif"); height: 266px; left: 50%; margin-left: -280px; margin-top: -161px; position: absolute; top: 50%; width: 500px; z-index: 10; }
+.logintxt { padding-left: 100px; padding-top: 82px; }
+.f_login td { color: #000000; font-family: "Î¢ÈíÑÅºÚ"; font-size: 13px; line-height: 40px; }
+.f_login .user { background: url(../images/txtBg.gif) repeat-x left top; border: 1px solid #F69210; font-family: "Arial"; font-size: 12px; height: 19px; padding-top: 1px; width: 178px; }
+.inputBorder{border:1px solid #ccc;height:20px;line-height:20px;}
+.left_td { text-align: right; background: #fafafa; }
