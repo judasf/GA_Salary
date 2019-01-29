@@ -182,11 +182,11 @@
                     field: 'action',
                     width: '70',
                     halign: 'center',
-                    align: 'left',
+                    align: 'center',
                     formatter: function (value, row) {
                         var str = '';
 
-                        str += $.formatString('<img src="../js/easyui/themes/icons/pencil.png" title="编辑" onclick="editFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
+                        str += $.formatString('<img src="../js/easyui/themes/icons/pencil.png" title="编辑" onclick="editFun(\'{0}\');"/>&nbsp;&nbsp;&nbsp;&nbsp;', row.uid);
                         str += $.formatString('<img src="../js/easyui/themes/icons/no.png" title="删除" onclick="removeFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
                         //str += $.formatString('<img src="../css/images/ext_icons/lock/lock_edit.png" title="重置密码" onclick="resetPwdFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
                         return str;

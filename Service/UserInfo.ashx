@@ -23,6 +23,14 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
     /// 当前登陆用户名
     /// </summary>
     string thisUserName;
+    /// <summary>
+    /// 登录用户部门编号
+    /// </summary>
+    int DeptID;
+    /// <summary>
+    /// 登录角色
+    /// </summary>
+    int RoleID;
     public void ProcessRequest(HttpContext context)
     {
         //不让浏览器缓存
@@ -47,6 +55,8 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
         {
             UserDetail ud = new UserDetail();
             thisUserName = ud.LoginUser.UserName;
+            DeptID = ud.LoginUser.DeptId;
+            RoleID = ud.LoginUser.RoleId;
         }
         string method = HttpContext.Current.Request.PathInfo.Substring(1);
         if (method.Length != 0)
@@ -81,6 +91,10 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
             list.Add(" a.roleId =" + Request.Form["roleId"]);
         if (!string.IsNullOrEmpty(Request.Form["deptId"]))
             list.Add(" a.deptId =" + Request.Form["deptId"]);
+        //部门管理员只显示本部门人员
+        if (RoleID == 2)
+            list.Add(" a.deptid= " + DeptID.ToString());
+        //不显示工资管理员和人事管理员
         list.Add(" a.roleid<>1");
         list.Add(" a.roleid<>3");
 

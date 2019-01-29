@@ -240,3 +240,6 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/BaseInfo/upfiles/20190130011150_template.xls
+/BaseInfo/upfiles
+/upfiles

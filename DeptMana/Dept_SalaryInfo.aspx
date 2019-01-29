@@ -20,7 +20,7 @@
     <%--引入uploadify文件--%>
     <link rel="stylesheet" type="text/css" href="../js/uploadify/uploadify.css" />
     <script type="text/javascript" src="../js/uploadify/jquery.uploadify.js"></script>
-    <%  int roleid = 0;
+    <%  int roleid = 99;
         string userName = "";
         if (!Request.IsAuthenticated)
         {%>
@@ -80,11 +80,6 @@
                 pagination: true,//显示分页
                 columns: [[]]
             });
-            //$.post('Service/salary.ashx/GetSalary', function (result) {
-            //    deptsalaryGrid.datagrid({
-            //        columns: [result.columns]
-            //    }).datagrid("loadData", result.rows);
-            //}, 'json');
         });
     </script>
 </head>

@@ -83,6 +83,35 @@
                 }
             });
         };
+        //导入数据
+        var importDeptInfo = function () {
+            var dialog = parent.$.modalDialog({
+                title: '导入数据',
+                width: 600,
+                height: 230,
+                iconCls: 'ext-icon-table_go',
+                href: 'BaseInfo/DialogOP/DeptImport_OP.aspx',
+                buttons: [{
+                    text: '导入',
+                    handler: function () {
+                        parent.onFormSubmit(dialog, grid);
+                    }
+                },
+                    {
+                        text: '取消',
+                        handler: function () {
+                            dialog.dialog('close');
+                        }
+                    }
+                ]
+            });
+        };
+        //导出明细excel
+        var exportExcel = function () {
+            if ($('#searchForm').form('validate')) {
+                jsPostForm('../service/salary.ashx/ExportSalaryDetail', $.serializeObject($('#searchForm')));
+            }
+        };
         $(function () {
             grid = $('#grid').datagrid({
                 title: '部门信息表',
@@ -92,7 +121,7 @@
                 pagination: true,
                 singleSelect: true,
                 noheader: true,
-                pageSize:20,
+                pageSize: 20,
                 idField: 'deptid',
                 sortName: 'deptid',
                 sortOrder: 'asc',
@@ -132,7 +161,8 @@
                 }
             });
             var pager = $('#grid').datagrid('getPager');
-            pager.pagination({ layout: ['list', 'sep', 'first', 'prev', 'sep', 'links', 'sep', 'next', 'last', 'sep', 'refresh', 'sep', 'manual']
+            pager.pagination({
+                layout: ['list', 'sep', 'first', 'prev', 'sep', 'links', 'sep', 'next', 'last', 'sep', 'refresh', 'sep', 'manual']
             });
             //非管理员隐藏操作列
             if (roleid != 3)
@@ -145,7 +175,7 @@
         <table>
             <tr>
                 <%if (roleid == 3)
-                  { %>
+                    { %>
                 <td>
                     <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-group_add',plain:true"
                         onclick="addFun();">添加部门</a>
@@ -162,7 +192,14 @@
                 <td>
                     <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-magifier_zoom_out',plain:true"
                         onclick="$('#searchBox').searchbox('setValue','');grid.datagrid('load',{});">清空查询</a>
+                    <%if (roleid == 3)//工资管理员
+                        { %> <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_row_insert',plain:true"
+                                    onclick="importDeptInfo();">导入数据</a>
+                    <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:true"
+                                onclick="exportExcel();">导出</a>
+                    <%}%>
                 </td>
+
             </tr>
         </table>
     </div>

@@ -64,14 +64,13 @@ public class CommonDB : IHttpHandler, IRequiresSessionState
            new SqlParameter("@username",userNum),
            new SqlParameter("@userpwd",userPwd)
        };
-        string sql = "select a.*,b.deptid from empinfo a  left join userinfo b on a.username=b.username where  a.username=@username and userpwd=@userpwd";
+        string sql = "select * from empinfo  where  username=@username and userpwd=@userpwd";
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql, paras);
         if(ds.Tables[0].Rows.Count > 0)
         {
             DataRow row = ds.Tables[0].Rows[0];
             UserInfo user = new UserInfo();
             user.UID = Convert.ToInt32(row["uid"]);
-            //user.UserNum = Convert.ToString(row["UserNum"]);
             user.UserName = Convert.ToString(row["username"]);
             user.RoleId = Convert.ToInt32(row["RoleId"]);
             int deptid=0;

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Data;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 /// <summary>
 /// 部门操作
 /// </summary>
@@ -186,7 +187,7 @@ public class Department : IHttpHandler, IRequiresSessionState
     {
         string sql = "select * from department  order by deptid";
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
-        Response.Write(JsonConvert.CreateComboboxJson(ds.Tables[0],0));
+        Response.Write(JsonConvert.CreateComboboxJson(ds.Tables[0], 0));
     }
 
     /// <summary>
@@ -198,9 +199,68 @@ public class Department : IHttpHandler, IRequiresSessionState
 
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
         DataTable dt = ds.Tables[0];
-        dt.Columns[0].ColumnName = "单位名称";
-        MyXls.CreateXls(dt, "单位信息表.xls", "");
+        dt.Columns[0].ColumnName = "部门名称";
+        MyXls.CreateXls(dt, "部门信息表.xls", "");
         Response.Flush();
         Response.End();
+    }
+    /// <summary>
+    /// 导入上传的部门
+    /// </summary>
+    public void ImportDeptInfo()
+    {
+        string reportPath = "";
+        if (!string.IsNullOrEmpty(Request.Form["report"]))
+            reportPath = Server.MapPath("~") + Request.Form["report"].ToString();
+        if (ExcelHelper.CheckFileExists(reportPath) == -1)
+        {
+            Response.Write("{\"success\":false,\"msg\":\"上传文件不存在，请检查！\"}");
+            return;
+        }
+        string sn = "部门信息";
+        DataTable dt = new DataTable();
+        if (ExcelHelper.CheckSheetContains(reportPath, sn) == -1)
+        {
+            Response.Write("{\"success\":false,\"msg\":\"单元表“" + sn + "”不存在，请检查文件！\"}");
+            return;
+        }
+        else
+        {
+            dt = ExcelHelper.RenderDataTableFromExcel(reportPath, sn, 0, false, 1, 0);
+        }
+        if (dt.TableName == "Error")
+        {
+            Response.Write("{\"success\":false,\"msg\":\"" + dt.Rows[0][0].ToString() + ",请检查文件！\"}");
+            return;
+        }
+        //定义sqlparameter 
+        List<SqlParameter> _paras = new List<SqlParameter>();
+        StringBuilder sql = new StringBuilder();
+        //遍历数据
+        if (dt.Rows.Count > 0)
+        {
+            foreach (DataRow dr in dt.Rows)
+            {
+                try
+                {
+                    _paras.Add(new SqlParameter("@deptname", String.IsNullOrEmpty(dr[0].ToString()) ? "" : dr[0].ToString()));
+                    sql.Append(" IF NOT EXISTS(SELECT * FROM department WHERE deptname=@deptname ");
+                    sql.Append("INSERT INTO department (department)");
+                    sql.Append(" VALUES (@deptname) ");
+                    SqlHelper.ExecuteNonQuery(SqlHelper.GetConnection(), CommandType.Text, sql.ToString(), _paras.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    Response.Write("{\"success\":false,\"msg\":\"执行出错，错误信息：" + ex.Message + ",请检查文件！\"}");
+                    return;
+                }
+                finally
+                {
+                    sql.Length = 0;
+                    _paras.Clear();
+                }
+            }
+        }
+        Response.Write("{\"success\":true,\"msg\":\"数据导入成功！\"}");
     }
 }

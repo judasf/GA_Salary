@@ -33,48 +33,26 @@
     <%} %>
     <script type="text/javascript">
         var grid;
-        var addFun = function () {
-            var dialog = parent.$.modalDialog({
-                title: '添加用户',
-                width: 340,
-                height: 300,
-                iconCls: 'ext-icon-note_add',
-                href: 'baseinfo/dialogop/UserInfo_op.aspx', //将对话框内容添加到父页面index
-                buttons: [{
-                    text: '添加',
-                    handler: function () {
-                        parent.onFormSubmit(dialog, grid);
-                    }
-                },
-                {
-                    text: '取消',
-                    handler: function () {
-                        dialog.dialog('close');
-                    }
+        var auditFun = function (id) {
+            parent.$.messager.confirm('询问', '确定要审核此项人事调动？', function (r) {
+                if (r) {
+                    $.post('../service/UserTransfer.ashx/AuditUserTransferByID', {
+                        id: id
+                    }, function (result) {
+                        if (result.success) {
+                            grid.datagrid('reload');
+                        } else {
+                            parent.$.messager.alert('提示', result.msg, 'error');
+                        }
+                    }, 'json');
                 }
-                ]
-            });
-        };
-        var editFun = function (id) {
-            var dialog = parent.$.modalDialog({
-                title: '编辑用户',
-                width: 340,
-                height: 300,
-                iconCls: 'icon-edit',
-                href: 'baseinfo/dialogop/UserInfo_op.aspx?uid=' + id,
-                buttons: [{
-                    text: '保存',
-                    handler: function () {
-                        parent.onFormSubmit(dialog, grid);
-                    }
-                }]
             });
         };
         var removeFun = function (id) {
-            parent.$.messager.confirm('询问', '您确定要删除此记录？', function (r) {
+            parent.$.messager.confirm('询问', '确定要删除此项申请？', function (r) {
                 if (r) {
-                    $.post('../service/UserInfo.ashx/RemoveUserInfoByID', {
-                        UID: id
+                    $.post('../service/UserTransfer.ashx/RemoveUserTransferByID', {
+                        id: id
                     }, function (result) {
                         if (result.success) {
                             grid.datagrid('reload');
@@ -83,71 +61,23 @@
                         }
                     }, 'json');
                 }
-            });
-        };
-        var resetPwdFun = function (id) {
-            parent.$.messager.confirm('询问', '恢复该用户密码？', function (r) {
-                if (r) {
-                    $.post('../service/UserInfo.ashx/ResetPwdByID', {
-                        UID: id
-                    }, function (result) {
-                        if (result.success) {
-                            grid.datagrid('reload');
-                            parent.$.messager.show({ title: '成功', msg: '密码恢复成功！' });
-                        } else {
-                            parent.$.messager.alert('提示', result.msg, 'error');
-                        }
-                    }, 'json');
-                }
-            });
-        };
-        //批量设置部门
-        var setDept = function () {
-            var rows = grid.datagrid('getSelections');
-            var ids = [];
-            if (rows.length == 0) {
-                parent.$.messager.alert('提示', '请选择人员', 'error');
-                return false;
-            }
-            for (var i = 0; i < rows.length; i++) {
-                var row = rows[i];
-                ids.push(row.uid);
-            }
-            var dialog = parent.$.modalDialog({
-                title: '设置部门',
-                width: 340,
-                height: 150,
-                iconCls: 'icon-edit',
-                href: 'baseinfo/dialogop/DeptSet_OP.aspx?ids=' + ids.join(','),
-                buttons: [{
-                    text: '保存',
-                    handler: function () {
-                        parent.onDeptSetFormSubmit(dialog, grid);
-                    }
-                },
-                {
-                    text: '取消',
-                    handler: function () {
-                        dialog.dialog('close');
-                    }
-                }]
             });
         };
         $(function () {
             grid = $('#grid').datagrid({
-                title: '用户管理',
-                url: '../service/UserInfo.ashx/GetUserInfo',
+                title: '人事调动',
+                url: '../service/UserTransfer.ashx/GetUserTransfer',
                 striped: true,
                 rownumbers: true,
                 pagination: true,
                 pageSize: 20,
-                singleSelect: false,
+                singleSelect: true,
                 noheader: true,
-                idField: 'uid',
-                sortName: 'uid',
+                idField: 'id',
+                sortName: 'id',
                 sortOrder: 'desc',
                 columns: [[{
-                    width: '120',
+                    width: '80',
                     title: '申请日期',
                     field: 'applydate',
                     halign: 'center',
@@ -160,32 +90,42 @@
                     halign: 'center',
                     align: 'center'
                 }, {
-                    width: '120',
+                    width: '80',
                     title: '姓名',
                     field: 'realname',
                     halign: 'center',
                     align: 'center'
                 }, {
-                    width: '120',
+                    width: '100',
                     title: '原部门',
                     field: 'olddept',
                     sortable: true,
                     halign: 'center',
                     align: 'center'
                 }, {
-                    width: '120',
+                    width: '100',
                     title: '新部门',
                     field: 'newdept',
                     halign: 'center',
                     align: 'center'
                 }, {
-                    width: '120',
+                    width: '80',
                     title: '当前进度',
                     field: 'status',
                     halign: 'center',
-                    align: 'center'
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        switch (value) {
+                            case '0':
+                                return '待审核'
+                                break;
+                            case '1':
+                                return '已审核'
+                                break;
+                        }
+                    }
                 }, {
-                    width: '120',
+                    width: '80',
                     title: '申请人',
                     field: 'applyuser',
                     halign: 'center',
@@ -195,16 +135,21 @@
                     field: 'action',
                     width: '70',
                     halign: 'center',
-                    align: 'left',
+                    align: 'center',
                     formatter: function (value, row) {
                         var str = '';
-
-                        str += $.formatString('<img src="../js/easyui/themes/icons/pencil.png" title="编辑" onclick="editFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
-                        str += $.formatString('<img src="../js/easyui/themes/icons/no.png" title="删除" onclick="removeFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
-                        //str += $.formatString('<img src="../css/images/ext_icons/lock/lock_edit.png" title="重置密码" onclick="resetPwdFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
+                        if (roleid == 3) { //人事管理员
+                            if (row.status == 0)
+                                str += $.formatString('<a href="javascript:void(0)" onclick="auditFun(\'{0}\');">审核</a>&nbsp&nbsp&nbsp&nbsp;', row.id);
+                                str += $.formatString('<a href="javascript:void(0)" onclick="removeFun(\'{0}\');">删除</a>', row.id);
+                        }
                         return str;
                     }
                 }]],
+                rowStyler: function (index, row) {
+                    if (row.status == 0 && roleid == 3)
+                        return 'color:#f00;font-weight:700;';
+                },
                 toolbar: '#toolbar',
                 onLoadSuccess: function (data) {
                     parent.$.messager.progress('close');
@@ -244,10 +189,16 @@
                                 <td>
                                     <input name="userName" class="combo" style="width: 180px;" />
                                 </td>
-                                <td style="width: 80px; text-align: right;">姓名：
+                                <td style="width: 60px; text-align: right;">姓名：
                                 </td>
                                 <td>
                                     <input name="realName" class="combo" style="width: 80px;" />
+                                </td>
+                                <td style="width: 60px; text-align: right;">进度：
+                                </td>
+                                <td>
+                                    <input style="width: 60px" name="status" id="status" class="easyui-combobox"
+                                        data-options="panelHeight:'auto',editable:false,valueField:'value',textField:'text',data:[{'value':'0','text':'待审核'},{'value':'1','text':'已审核'}]" />
                                 </td>
                                 <td>
                                     <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-search',plain:true"
@@ -261,25 +212,6 @@
                     </form>
                 </td>
             </tr>
-            <%if (roleid == 3)//人事管理员
-                { %>
-            <tr>
-                <td>
-                    <table>
-                        <tr>
-                            <td>
-                                <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-note_add',plain:true"
-                                    onclick="addFun();">添加新用户</a>
-                            </td>
-                            <td>
-                                <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-group',plain:true"
-                                    onclick="setDept();">设置部门</a>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <%} %>
         </table>
     </div>
     <div data-options="region:'center',fit:true,border:false">

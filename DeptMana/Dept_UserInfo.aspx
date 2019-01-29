@@ -54,37 +54,6 @@
                 }]
             });
         };
-        var removeFun = function (id) {
-            parent.$.messager.confirm('询问', '您确定要删除此记录？', function (r) {
-                if (r) {
-                    $.post('../service/UserInfo.ashx/RemoveUserInfoByID', {
-                        UID: id
-                    }, function (result) {
-                        if (result.success) {
-                            grid.datagrid('reload');
-                        } else {
-                            parent.$.messager.alert('提示', result.msg, 'error');
-                        }
-                    }, 'json');
-                }
-            });
-        };
-        var resetPwdFun = function (id) {
-            parent.$.messager.confirm('询问', '恢复该用户密码？', function (r) {
-                if (r) {
-                    $.post('../service/UserInfo.ashx/ResetPwdByID', {
-                        UID: id
-                    }, function (result) {
-                        if (result.success) {
-                            grid.datagrid('reload');
-                            parent.$.messager.show({ title: '成功', msg: '密码恢复成功！' });
-                        } else {
-                            parent.$.messager.alert('提示', result.msg, 'error');
-                        }
-                    }, 'json');
-                }
-            });
-        };
         $(function () {
             grid = $('#grid').datagrid({
                 title: '用户管理',
@@ -134,7 +103,6 @@
                         var str = '';
 
                         str += $.formatString('<a href="javascript:void(0);" title="人事调动" onclick="transferFun(\'{0}\');">人事调动</a>', row.uid);
-                        //str += $.formatString('<img src="../css/images/ext_icons/lock/lock_edit.png" title="重置密码" onclick="resetPwdFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
                         return str;
                     }
                 }]],
