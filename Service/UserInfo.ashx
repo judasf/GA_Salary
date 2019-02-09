@@ -156,7 +156,7 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
         paras[2].Value = deptId;
         paras[3].Value = userPwd;
         paras[4].Value = realName;
-        //判断用户号码是否存在
+        //判断身份证号是否存在
         StringBuilder sql = new StringBuilder("if not exists(select * from empinfo where username=@userName)");
         sql.Append(" INSERT INTO empinfo values(@userName,@userPwd,@realName,@roleId,@deptId); ");
         /*
@@ -235,7 +235,8 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
     {
         int uid = 0;
         int.TryParse(Request.Form["uid"], out uid);
-        string userPwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile("888888", "MD5");
+        string userPwd = "123456";
+        //string userPwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile("888888", "MD5");
         SqlParameter[] paras = new SqlParameter[]{
             new SqlParameter("@id", SqlDbType.Int),
             new SqlParameter("@userPwd", SqlDbType.VarChar)
@@ -256,9 +257,12 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
     {
         int uid = 0;
         int.TryParse(Request.Form["uid"], out uid);
-        string oldPwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Convert.ToString(Request.Form["oldPwd"]), "MD5");
-        string pwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Convert.ToString(Request.Form["pwd"]), "MD5");
-        string rePwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Convert.ToString(Request.Form["rePwd"]), "MD5");
+        //string oldPwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Convert.ToString(Request.Form["oldPwd"]), "MD5");
+        //string pwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Convert.ToString(Request.Form["pwd"]), "MD5");
+        //string rePwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(Convert.ToString(Request.Form["rePwd"]), "MD5");
+        string oldPwd = Request.Form["oldPwd"];
+        string pwd = Request.Form["pwd"];
+        string rePwd = Request.Form["rePwd"];
         if (pwd != rePwd)
         {
             Response.Write("{\"success\":false,\"msg\":\"两次密码输入不一致！\"}");
@@ -273,8 +277,8 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
         paras[1].Value = oldPwd;
         paras[2].Value = pwd;
         StringBuilder sql = new StringBuilder();
-        sql.Append("if exists(select * from userinfo  where uid=@uid and userpwd=@oldPwd)");
-        sql.Append("update userinfo set userpwd=@pwd where uid =@uid");
+        sql.Append("if exists(select * from empinfo  where uid=@uid and userpwd=@oldPwd)");
+        sql.Append("update empinfo set userpwd=@pwd where uid =@uid");
         int result = SqlHelper.ExecuteNonQuery(SqlHelper.GetConnection(), CommandType.Text, sql.ToString(), paras);
         if (result == 1)
             Response.Write("{\"success\":true,\"msg\":\"修改成功！\"}");

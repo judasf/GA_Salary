@@ -180,15 +180,15 @@
                 }, {
                     title: '操作',
                     field: 'action',
-                    width: '70',
+                    width: '80',
                     halign: 'center',
                     align: 'center',
                     formatter: function (value, row) {
                         var str = '';
 
                         str += $.formatString('<img src="../js/easyui/themes/icons/pencil.png" title="编辑" onclick="editFun(\'{0}\');"/>&nbsp;&nbsp;&nbsp;&nbsp;', row.uid);
-                        str += $.formatString('<img src="../js/easyui/themes/icons/no.png" title="删除" onclick="removeFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
-                        //str += $.formatString('<img src="../css/images/ext_icons/lock/lock_edit.png" title="重置密码" onclick="resetPwdFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
+                        str += $.formatString('<img src="../js/easyui/themes/icons/no.png" title="删除" onclick="removeFun(\'{0}\');"/>&nbsp;&nbsp;&nbsp;&nbsp;', row.uid);
+                        str += $.formatString('<img src="../css/images/ext_icons/lock/lock_edit.png" title="重置密码" onclick="resetPwdFun(\'{0}\');"/>&nbsp;&nbsp;', row.uid);
                         return str;
                     }
                 }]],
@@ -267,11 +267,11 @@
                         <tr>
                             <td>
                                 <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-note_add',plain:true"
-                                    onclick="addFun();">添加新用户</a>
+                                    onclick="addFun();">添加用户</a>
                             </td>
                             <td>
                                 <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-group',plain:true"
-                                    onclick="setDept();">设置部门</a>
+                                    onclick="setDept();">批量设置部门</a>
                             </td>
                         </tr>
                     </table>

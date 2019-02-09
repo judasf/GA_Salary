@@ -109,7 +109,7 @@
         //导出明细excel
         var exportExcel = function () {
             if ($('#searchForm').form('validate')) {
-                jsPostForm('../service/salary.ashx/ExportSalaryDetail', $.serializeObject($('#searchForm')));
+                jsPostForm('../service/Department.ashx/ExportDepartment', $.serializeObject($('#searchForm')));
             }
         };
         $(function () {
@@ -192,7 +192,7 @@
                 <td>
                     <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-magifier_zoom_out',plain:true"
                         onclick="$('#searchBox').searchbox('setValue','');grid.datagrid('load',{});">清空查询</a>
-                    <%if (roleid == 3)//工资管理员
+                    <%if (roleid == 3)//人事管理员
                         { %> <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_row_insert',plain:true"
                                     onclick="importDeptInfo();">导入数据</a>
                     <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:true"

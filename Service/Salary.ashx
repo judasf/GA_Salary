@@ -29,6 +29,10 @@ public class salary : IHttpHandler, IRequiresSessionState
     /// 部门编号
     /// </summary>
     int deptId;
+    /// <summary>
+    /// 角色编号
+    /// </summary>
+    int roleid;
     public void ProcessRequest(HttpContext context)
     {
         //不让浏览器缓存
@@ -54,6 +58,7 @@ public class salary : IHttpHandler, IRequiresSessionState
             UserDetail ud = new UserDetail();
             userName = ud.LoginUser.UserName;
             deptId = ud.LoginUser.DeptId;
+            roleid = ud.LoginUser.RoleId;
         }
         string method = HttpContext.Current.Request.PathInfo.Substring(1);
         if (method.Length != 0)
@@ -91,7 +96,10 @@ public class salary : IHttpHandler, IRequiresSessionState
             Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
             return;
         }
-        string sql = "select * from " + tbname + " where [身份证号码]='" + userName + "'";
+        string where = "";
+        if (roleid == 0 || roleid ==2)
+            where = " where [身份证号码]='" + userName + "'";
+        string sql = "select * from " + tbname + where;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
         Response.Write(JsonConvert.GetJsonFromDataTable(ds, ds.Tables[0].Rows.Count, true));
     }
@@ -114,7 +122,10 @@ public class salary : IHttpHandler, IRequiresSessionState
             Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
             return;
         }
-        string sql = "select * from " + tbname + " where [身份证号码]='" + userName + "'";
+         string where = "";
+        if (roleid == 0 || roleid ==2)
+            where = " where [身份证号码]='" + userName + "'";
+        string sql = "select * from " + tbname + where;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql.ToString());
         DataTable dt = ds.Tables[0];
         MyXls.CreateXls(dt, sdate + "工资明细.xls", "1,3");

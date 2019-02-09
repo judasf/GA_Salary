@@ -103,7 +103,7 @@
                 <%} %>
                 <li class="clearboth"></li>
             </ul>
-            <span style="float: right; padding-right: 20px; font-size: 14px; line-height: 36px; color: #fff;">[<%=userName%>]，欢迎您！ <a
+            <span style="float: right; padding-right: 20px; font-size: 14px; line-height: 36px; color: #fff;">[<%=userName%>]，欢迎您！ <a href="javascript:void(0);" onclick="editCurrentUserPwd();">[修改密码]</a> <a
                 href="javascript:void(0);" onclick="logOut();">[安全退出]</a> </span>
         </div>
         <div class="clearboth"></div>

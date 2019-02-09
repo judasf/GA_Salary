@@ -196,11 +196,10 @@ public class Department : IHttpHandler, IRequiresSessionState
     public void ExportDepartment()
     {
         string sql = "select deptname from department ";
-
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
         DataTable dt = ds.Tables[0];
         dt.Columns[0].ColumnName = "部门名称";
-        MyXls.CreateXls(dt, "部门信息表.xls", "");
+        ExcelHelper.ExportByWeb(dt, "", "部门信息表.xls", "部门信息");
         Response.Flush();
         Response.End();
     }
@@ -244,9 +243,9 @@ public class Department : IHttpHandler, IRequiresSessionState
                 try
                 {
                     _paras.Add(new SqlParameter("@deptname", String.IsNullOrEmpty(dr[0].ToString()) ? "" : dr[0].ToString()));
-                    sql.Append(" IF NOT EXISTS(SELECT * FROM department WHERE deptname=@deptname ");
-                    sql.Append("INSERT INTO department (department)");
-                    sql.Append(" VALUES (@deptname) ");
+                    sql.Append(" IF NOT EXISTS(SELECT * FROM department WHERE deptname=@deptname) ");
+                    sql.Append("INSERT INTO department (deptname)");
+                    sql.Append(" VALUES (@deptname); ");
                     SqlHelper.ExecuteNonQuery(SqlHelper.GetConnection(), CommandType.Text, sql.ToString(), _paras.ToArray());
                 }
                 catch (Exception ex)

@@ -74,7 +74,7 @@
                 });
                 $.post('Service/salary.ashx/GetSalary', $.serializeObject($('#searchForm')), function (result) {
                     parent.$.messager.progress('close');
-                    if (result.total == 1) {
+                    if (result.total >= 1) {
                         salaryGrid.datagrid({
                             columns: [result.columns]
                         }).datagrid("loadData", result.rows);
@@ -100,7 +100,7 @@
                 fit: false,//自动大小  
                 rownumbers: false,//行号 
                 singleSelect: false,//单行选取
-                pagination: false,//显示分页
+                pagination: true,//显示分页
                 columns: [[]]
             });
             //$.post('Service/salary.ashx/GetSalary', function (result) {
@@ -141,8 +141,7 @@
                                 { %> <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_row_insert',plain:false"
                                     onclick="imporResources();">导入数据</a>
                             <%}
-                                else
-                                { %>
+                            %>
                              月份：
                             <input style="width: 80px;" name="sdate" class="Wdate easyui-validatebox" onfocus="WdatePicker({maxDate:'%y-%M',dateFmt:'yyyy-MM'})"
                                 readonly="readonly" required />
@@ -150,7 +149,7 @@
                                 onclick="searchGrid();">工资查询</a>
                             <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:false"
                                 onclick="exportExcel();">导出</a>
-                            <%} %>
+
                         </td>
                     </tr>
                 </table>
