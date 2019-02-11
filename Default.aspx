@@ -94,7 +94,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td height="36" colspan="2" align="center" background="../images/Login_Down.gif" class="STYLE6" scope="col">客服热线:18503722071 5129660</td>
+                        <td height="36" colspan="2" align="center" background="../images/Login_Down.gif" class="STYLE6" scope="col" style=" color: #fff;">客服热线:18503722071 <a href="工资系统使用说明.docx" target="_blank" style="color:#fff;text-decoration:none;">5156382</a></td>
                     </tr>
                 </table>
             </div>

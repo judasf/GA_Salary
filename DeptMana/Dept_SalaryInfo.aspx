@@ -54,7 +54,7 @@
                     if (result.total >= 1) {
                         deptsalaryGrid.datagrid({
                             columns: [result.columns]
-                        }).datagrid("loadData", result.rows);
+                        }).datagrid({ loadFilter: pagerFilter }).datagrid("loadData", result.rows);
                     } else {
                         parent.$.messager.alert('提示', '无该月工资数据', 'error');
                         deptsalaryGrid.datagrid({
@@ -70,6 +70,36 @@
                 jsPostForm('../service/salary.ashx/ExportDeptSalaryDetail', $.serializeObject($('#searchForm')));
             }
         };
+        //设置分页
+        var pagerFilter = function (data) {
+            if (typeof data.length == 'number' && typeof data.splice == 'function') {	// is array
+                data = {
+                    total: data.length,
+                    rows: data
+                }
+            }
+            var dg = $(this);
+            var opts = dg.datagrid('options');
+            var pager = dg.datagrid('getPager');
+            pager.pagination({
+                onSelectPage: function (pageNum, pageSize) {
+                    opts.pageNumber = pageNum;
+                    opts.pageSize = pageSize;
+                    pager.pagination('refresh', {
+                        pageNumber: pageNum,
+                        pageSize: pageSize
+                    });
+                    dg.datagrid('loadData', data);
+                }
+            });
+            if (!data.originalRows) {
+                data.originalRows = (data.rows);
+            }
+            var start = (opts.pageNumber - 1) * parseInt(opts.pageSize);
+            var end = start + parseInt(opts.pageSize);
+            data.rows = (data.originalRows.slice(start, end));
+            return data;
+        }
         //工资表
         var deptsalaryGrid;
         $(function () {
@@ -78,6 +108,7 @@
                 rownumbers: false,//行号 
                 singleSelect: false,//单行选取
                 pagination: true,//显示分页
+                pageSize: 20,//
                 columns: [[]]
             });
         });
@@ -101,7 +132,7 @@
                                 readonly="readonly" required />
                             <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-search',plain:false"
                                 onclick="searchGrid();">工资查询</a>
-                              <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:false"
+                            <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:false"
                                 onclick="exportExcel();">导出</a>
                         </td>
                     </tr>

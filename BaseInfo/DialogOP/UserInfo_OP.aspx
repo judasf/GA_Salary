@@ -71,7 +71,7 @@
             <td class="left_td">所在部门：
             </td>
             <td class="tdinput">
-                <input id="deptId" type="text" name="deptId" class="easyui-combobox combo" data-options="required:true,valueField:'id',textField:'text',editable:false,panelHeight:'auto',url:'service/Department.ashx/GetDepartmentCombobox'" />
+                <input id="deptId" type="text" name="deptId" class="easyui-combobox combo" data-options="required:true,valueField:'id',textField:'text',editable:false,panelHeight:'160',url:'service/Department.ashx/GetDepartmentCombobox'" />
             </td>
         </tr>
         <tr>

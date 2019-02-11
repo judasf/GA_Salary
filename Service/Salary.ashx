@@ -97,11 +97,17 @@ public class salary : IHttpHandler, IRequiresSessionState
             return;
         }
         string where = "";
-        if (roleid == 0 || roleid ==2)
-            where = " where [身份证号码]='" + userName + "'";
+        if (roleid == 0 || roleid == 2)
+            where = " where  [身份证号码]='" + userName + "'";
+        // int total = 0;
         string sql = "select * from " + tbname + where;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
         Response.Write(JsonConvert.GetJsonFromDataTable(ds, ds.Tables[0].Rows.Count, true));
+
+        //string tableName = "empinfo a  left join roleinfo b on a.roleid=b.roleid  left join department c on a.deptid=c.deptid";
+        //string fieldStr = "*";
+        //DataSet ds = SqlHelper.GetPagination(tbname, fieldStr, Request.Form["sort"].ToString(), Request.Form["order"].ToString(), where, Convert.ToInt32(Request.Form["rows"]), Convert.ToInt32(Request.Form["page"]), out total);
+        //Response.Write(JsonConvert.GetJsonFromDataTable(ds, total,true));
     }
     /// <summary>
     /// 个人工资导出
@@ -122,13 +128,13 @@ public class salary : IHttpHandler, IRequiresSessionState
             Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
             return;
         }
-         string where = "";
-        if (roleid == 0 || roleid ==2)
+        string where = "";
+        if (roleid == 0 || roleid == 2)
             where = " where [身份证号码]='" + userName + "'";
         string sql = "select * from " + tbname + where;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql.ToString());
         DataTable dt = ds.Tables[0];
-        MyXls.CreateXls(dt, sdate + "工资明细.xls", "1,3");
+        ExcelHelper.ExportByWeb(dt, "", sdate + "工资明细.xls", "工资信息");
         Response.Flush();
         Response.End();
     }
@@ -201,7 +207,7 @@ public class salary : IHttpHandler, IRequiresSessionState
             Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
             return;
         }
-        string sql = "select c.deptname as [部门名称],b.* FROM dbo.empinfo  a  LEFT JOIN   " + tbname + " b ON a.username=b.身份证号码 LEFT JOIN dbo.Department c ON a.deptid=c.DeptID WHERE a.deptid=" + deptId;
+        string sql = "select c.deptname as [部门名称],b.* FROM dbo.empinfo  a   JOIN   " + tbname + " b ON a.username=b.身份证号码  and a.roleid=0 LEFT JOIN dbo.Department c ON a.deptid=c.DeptID WHERE a.deptid=" + deptId;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
         Response.Write(JsonConvert.GetJsonFromDataTable(ds, ds.Tables[0].Rows.Count, true));
     }
@@ -224,15 +230,28 @@ public class salary : IHttpHandler, IRequiresSessionState
             Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
             return;
         }
-        string sql = "select c.deptname as [部门名称],b.* FROM dbo.empinfo  a  LEFT JOIN   " + tbname + " b ON a.username=b.身份证号码 LEFT JOIN dbo.Department c ON a.deptid=c.DeptID WHERE a.deptid=" + deptId;
+        string sql = "select c.deptname as [部门名称],b.* FROM dbo.empinfo  a  JOIN   " + tbname + " b ON a.username=b.身份证号码 LEFT JOIN dbo.Department c ON a.deptid=c.DeptID WHERE a.deptid=" + deptId;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql.ToString());
         DataTable dt = ds.Tables[0];
-        MyXls.CreateXls(dt, sdate + "部门工资明细.xls", "2,4");
+        ExcelHelper.ExportByWeb(dt, "", sdate + "部门工资明细.xls", "工资信息");
         Response.Flush();
         Response.End();
     }
     #endregion
-
+    #region 工资管理员操作
+    /// <summary>
+    /// 获取已导入工资表信息
+    /// </summary>
+    public void GetSalaryTableInfo()
+    {
+        int total = 0;
+        string where = " name LIKE 'salaryinfo%' AND type = 'U' ";
+        string tableName = "sysobjects";
+        string fieldStr = "name,crdate";
+        DataSet ds = SqlHelper.GetPagination(tableName, fieldStr, Request.Form["sort"].ToString(), Request.Form["order"].ToString(), where, Convert.ToInt32(Request.Form["rows"]), Convert.ToInt32(Request.Form["page"]), out total);
+        Response.Write(JsonConvert.GetJsonFromDataTable(ds, total));
+    }
+    #endregion
     public bool IsReusable
     {
         get

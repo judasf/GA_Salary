@@ -42,29 +42,6 @@
     </script>
     <%} %>
     <script type="text/javascript">
-        //导入数据
-        var imporResources = function () {
-            var dialog = parent.$.modalDialog({
-                title: '导入数据',
-                width: 600,
-                height: 230,
-                iconCls: 'ext-icon-table_go',
-                href: 'Dialog/ImportFile_op.aspx',
-                buttons: [{
-                    text: '导入',
-                    handler: function () {
-                        parent.onFormSubmit(dialog, salaryGrid);
-                    }
-                },
-                    {
-                        text: '取消',
-                        handler: function () {
-                            dialog.dialog('close');
-                        }
-                    }
-                ]
-            });
-        };
         //查询功能
         var searchGrid = function () {
             if ($('#searchForm').form('validate')) {
@@ -100,27 +77,14 @@
                 fit: false,//自动大小  
                 rownumbers: false,//行号 
                 singleSelect: false,//单行选取
-                pagination: true,//显示分页
+                pagination: true, //显示分页
+                pageSize: 20,
+                idField: '身份证号码',
+                sortName: '身份证号码',
+                sortOrder: 'desc',
                 columns: [[]]
             });
-            //$.post('Service/salary.ashx/GetSalary', function (result) {
-            //    salaryGrid.datagrid({
-            //        columns: [result.columns]
-            //    }).datagrid("loadData", result.rows);
-            //}, 'json');
         });
-        //退出登录
-        var logOut = function () {
-            $.ajax({
-                type: "post",
-                dataType: "json",
-                url: "service/commondb.ashx/LogOut"
-            }).done(function (result) {
-                if (result.success) {
-                    location.replace('default.aspx');
-                }
-            });
-        };
     </script>
 </head>
 <body class="easyui-layout">
@@ -136,12 +100,6 @@
                     <tr>
 
                         <td align="left" style="padding: 5px;">
-
-                            <%if (roleid == 1)//工资管理员
-                                { %> <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_row_insert',plain:false"
-                                    onclick="imporResources();">导入数据</a>
-                            <%}
-                            %>
                              月份：
                             <input style="width: 80px;" name="sdate" class="Wdate easyui-validatebox" onfocus="WdatePicker({maxDate:'%y-%M',dateFmt:'yyyy-MM'})"
                                 readonly="readonly" required />
@@ -149,7 +107,6 @@
                                 onclick="searchGrid();">工资查询</a>
                             <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:false"
                                 onclick="exportExcel();">导出</a>
-
                         </td>
                     </tr>
                 </table>
