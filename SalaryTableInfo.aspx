@@ -65,6 +65,21 @@
                 ]
             });
         };
+        var delTableFun = function (name) {
+            parent.$.messager.confirm('询问', '您确定要删除该月工资数据？', function (r) {
+                if (r) {
+                    $.post('../service/Salary.ashx/DelTableByName', {
+                        tablename: name
+                    }, function (result) {
+                        if (result.success) {
+                            salaryTableGrid.datagrid('reload');
+                        } else {
+                            parent.$.messager.alert('提示', result.msg, 'error');
+                        }
+                    }, 'json');
+                }
+            });
+        };
         //工资数据表列表
         var salaryTableGrid;
         $(function () {
@@ -93,6 +108,17 @@
                     field: 'crdate',
                     halign: 'center',
                     align: 'center'
+                }, {
+                    title: '操作',
+                    field: 'action',
+                    width: '50',
+                    halign: 'center',
+                    align: 'center',
+                    formatter: function (value, row) {
+                        var str = '';
+                        str += $.formatString('<img src="../js/easyui/themes/icons/no.png" title="删除" onclick="delTableFun(\'{0}\');"/>', row.name);
+                        return str;
+                    }
                 }]],
                 toolbar: '#toolbar',
                 onLoadSuccess: function (data) {

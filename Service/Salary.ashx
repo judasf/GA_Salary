@@ -251,6 +251,16 @@ public class salary : IHttpHandler, IRequiresSessionState
         DataSet ds = SqlHelper.GetPagination(tableName, fieldStr, Request.Form["sort"].ToString(), Request.Form["order"].ToString(), where, Convert.ToInt32(Request.Form["rows"]), Convert.ToInt32(Request.Form["page"]), out total);
         Response.Write(JsonConvert.GetJsonFromDataTable(ds, total));
     }
+    /// <summary>
+    /// 通过name删除月度工资表信息
+    /// </summary>
+    public void DelTableByName()
+    {
+        string tablename = Convert.ToString(Request.Form["tablename"]);
+        string sql = "drop table " + tablename;
+        int result = SqlHelper.ExecuteNonQuery(SqlHelper.GetConnection(), CommandType.Text, sql);
+        Response.Write("{\"success\":true,\"msg\":\"执行成功\"}");
+    }
     #endregion
     public bool IsReusable
     {
