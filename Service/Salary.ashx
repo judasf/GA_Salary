@@ -209,7 +209,7 @@ public class salary : IHttpHandler, IRequiresSessionState
         }
         string sql = "select c.deptname as [部门名称],b.* FROM dbo.empinfo  a   JOIN   " + tbname + " b ON a.username=b.身份证号码  and a.roleid=0 LEFT JOIN dbo.Department c ON a.deptid=c.DeptID WHERE a.deptid=" + deptId;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
-        Response.Write(JsonConvert.GetJsonFromDataTable(ds, ds.Tables[0].Rows.Count, true));
+        Response.Write(JsonConvert.GetJsonFromDataTableAllColumns(ds, ds.Tables[0].Rows.Count, true));
     }
     /// <summary>
     /// 部门管理员工资导出

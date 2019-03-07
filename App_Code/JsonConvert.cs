@@ -499,8 +499,8 @@ public sealed class JsonConvert
                     {
                         JsonString.Append("\"" + dt.Columns[j].ColumnName.ToString().ToLower() + "\":" + "\"" + JsonCharFilter(dt.Rows[i][j].ToString()) + "\",");
                         //只生成一次列名
-                        if(i==0)
-                        columnsStr.Append("{\"field\":\"" + dt.Columns[j].ColumnName + "\",\"title\":\"" + dt.Columns[j].ColumnName + "\",\"align\":\"center\",\"width\":100},");
+                        if (i == 0)
+                            columnsStr.Append("{\"field\":\"" + dt.Columns[j].ColumnName + "\",\"title\":\"" + dt.Columns[j].ColumnName + "\",\"align\":\"center\",\"width\":100},");
                     }
                     else if (j == dt.Columns.Count - 1)
                     {
@@ -508,6 +508,83 @@ public sealed class JsonConvert
                         if (i == 0)
                             columnsStr.Append("{\"field\":\"" + dt.Columns[j].ColumnName + "\",\"title\":\"" + dt.Columns[j].ColumnName + "\",\"align\":\"center\",\"width\":100}");
                     }
+                }
+            }
+            if (i == dt.Rows.Count - 1)
+            {
+                JsonString.Append("} ");
+            }
+            else
+            {
+                JsonString.Append("}, ");
+            }
+        }
+        JsonString.Append("]");
+        columnsStr.Append("]");
+
+        JsonString.Append(",");
+
+        JsonString.Append("\"total\":");
+        JsonString.Append(total);
+        //增加列名
+        JsonString.Append(columnsStr);
+        JsonString.Append("}");
+        //return JsonString.ToString().Replace("\n", "");
+        return JsonString.ToString();
+        //return JsonCharFilter( JsonString.ToString());
+    }
+    /// <summary>
+    /// 将DataSet转换为JSON字符串,动态生成列名（显示所有列）
+    /// </summary>
+    /// <param name="ds">数据集</param>
+    ///  <param name="total">总记录数</param>
+    /// <param name="createColumns">是否生成列名</param>
+    /// <returns>JSON字符串</returns>
+    public static string GetJsonFromDataTableAllColumns(DataSet ds, int total, bool createColumns)
+    {
+        if (!createColumns)
+            GetJsonFromDataTable(ds, total);
+        else
+        {
+        }
+        DataTable dt = ds.Tables[0];
+        StringBuilder JsonString = new StringBuilder();
+        if (dt.Rows.Count == 0)
+        {
+            JsonString.Append("{ ");
+            JsonString.Append("\"rows\":[ ");
+            JsonString.Append("]");
+
+            JsonString.Append(",");
+
+            JsonString.Append("\"total\":");
+            JsonString.Append(total);
+            JsonString.Append("}");
+            return JsonString.ToString();
+        }
+
+        //动态生成列
+        StringBuilder columnsStr = new StringBuilder(",\"columns\":[ ");
+        JsonString.Append("{ ");
+        JsonString.Append("\"rows\":[ ");
+        for (int i = 0; i < dt.Rows.Count; i++)
+        {
+            JsonString.Append("{ ");
+            //columnsStr.Append("{ ");
+            for (int j = 0; j < dt.Columns.Count; j++)
+            {
+                if (j < dt.Columns.Count - 1)
+                {
+                    JsonString.Append("\"" + dt.Columns[j].ColumnName.ToString().ToLower() + "\":" + "\"" + JsonCharFilter(dt.Rows[i][j].ToString()) + "\",");
+                    //只生成一次列名
+                    if (i == 0)
+                        columnsStr.Append("{\"field\":\"" + dt.Columns[j].ColumnName + "\",\"title\":\"" + dt.Columns[j].ColumnName + "\",\"align\":\"center\",\"width\":100},");
+                }
+                else if (j == dt.Columns.Count - 1)
+                {
+                    JsonString.Append("\"" + dt.Columns[j].ColumnName.ToString().ToLower() + "\":" + "\"" + JsonCharFilter(dt.Rows[i][j].ToString()) + "\"");
+                    if (i == 0)
+                        columnsStr.Append("{\"field\":\"" + dt.Columns[j].ColumnName + "\",\"title\":\"" + dt.Columns[j].ColumnName + "\",\"align\":\"center\",\"width\":100}");
                 }
             }
             if (i == dt.Rows.Count - 1)
