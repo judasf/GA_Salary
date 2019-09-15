@@ -23,7 +23,8 @@
     <%  int roleid = 0;
         string userName = "";
         if (!Request.IsAuthenticated)
-        {%>
+        {Response.Redirect("index.aspx");
+            %>
     <script type="text/javascript">
         parent.$.messager.alert('提示', '登陆超时，请重新登陆再进行操作！', 'error', function () {
             parent.location.replace('index.aspx');
