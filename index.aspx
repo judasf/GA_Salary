@@ -99,6 +99,7 @@
                 <%if (roleid == 2)//部门管理员
                     { %>
                 <li class="current"><a href="DeptMana/Dept_SalaryInfo.aspx" target="mainfrm">部门工资</a></li>
+                <li><a href="DeptMana/Dept_SalaryOtherInfo.aspx" target="mainfrm">部门其他薪酬</a></li>
                 <li><a href="DeptMana/Dept_UserInfo.aspx" target="mainfrm">部门人员</a></li>
                 <li><a href="BaseInfo/UserTransfer.aspx" target="mainfrm">人事调动</a></li>
                 <%}

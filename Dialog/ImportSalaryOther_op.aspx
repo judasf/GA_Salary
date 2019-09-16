@@ -12,7 +12,7 @@
 
     var onFormSubmit = function ($dialog, $grid) {
         if ($('#upform').form('validate')) {
-            var url = 'service/salary.ashx/ImportSalaryOntherInfo';
+            var url = 'service/salary.ashx/ImportSalaryOtherInfo';
             //判断是否有报表上传
             if ($('#report').val() == "") {
                 parent.$.messager.alert('提示', '请上传文件后再导入数据！', 'error');
@@ -135,7 +135,7 @@
 <form method="post" id="upform">
     <table class="table table-bordered  table-hover">
         <tr>
-            <td>薪酬月份</td>
+            <td>月份</td>
             <td style="text-align: left;"> <input style="width: 80px;" name="smonth" class="Wdate easyui-validatebox" onfocus="WdatePicker({maxDate:'%y-%M',dateFmt:'yyyy-MM'})"
                                 readonly="readonly" required /></td>
         </tr>

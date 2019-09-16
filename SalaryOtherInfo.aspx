@@ -23,8 +23,9 @@
     <%  int roleid = 0;
         string userName = "";
         if (!Request.IsAuthenticated)
-        {Response.Redirect("index.aspx");
-            %>
+        {
+            Response.Redirect("index.aspx");
+    %>
     <script type="text/javascript">
         parent.$.messager.alert('提示', '登陆超时，请重新登陆再进行操作！', 'error', function () {
             parent.location.replace('index.aspx');
@@ -57,7 +58,7 @@
                             columns: [result.columns]
                         }).datagrid("loadData", result.rows);
                     } else {
-                        parent.$.messager.alert('提示', '无该月工资数据', 'error');
+                        parent.$.messager.alert('提示', '无该月薪酬数据', 'error');
                         salaryOtherGrid.datagrid({
                             columns: [[]]
                         }).datagrid("loadData", { rows: [] });
@@ -66,43 +67,39 @@
             }
         };
         //导出明细excel
-        var exportExcel = function () {
+        var exportOtherExcel = function () {
             if ($('#searchForm').form('validate')) {
-                jsPostForm('../service/salary.ashx/ExportSalaryDetail', $.serializeObject($('#searchForm')));
+                jsPostForm('../service/salary.ashx/ExportSalaryOtherDetail', $.serializeObject($('#searchForm')));
             }
         };
         //日期控件选择月份后触发
         var pickTable = function () {
             var tm = $dp.cal.getNewDateStr();
-            $.post('Service/salary.ashx/GetSalaryOtherTable', { sdate: tm }, function (result) {
+            $.post('Service/salary.ashx/GetSalaryOtherTableName', { sdate: tm }, function (result) {
                 if (result.total >= 1) {
-                    salaryOther.combobox("loadData", result.rows);
+                    salaryOther.combobox("clear").combobox("loadData", result.rows);
                 } else {
                     parent.$.messager.alert('提示', '该月未导入其他薪酬数据', 'error');
-                    //salaryOther.combobox("loadData", [{"id":1,"text":"text1"}]);
+                    salaryOther.combobox("clear");
                 }
             }, 'json');
-            console.log($dp.cal.getNewDateStr());
 
         }
-        //日期控件清空后触发
+        //日期控件清空后触发,清空下拉框
         var clearTable = function () {
-            console.log($dp.cal.getNewDateStr());
+            salaryOther.combobox("clear");
         }
         //薪酬下拉列表框
         var salaryOther;
         //工资表
         var salaryOtherGrid;
         $(function () {
-            //自定义月份选择
-            //$('#sdate').blur(function () {
-            //    console.log($('#sdate').validatebox('validate'));
-            //});
-            
             salaryOther = $('#SalaryOther').combobox({
                 valueField: 'tablename',
                 textField: 'salaryname',
-                required:true
+                panelHeight: 'auto',
+                editable: false,
+                required: true
             });
             salaryOtherGrid = $('#salaryOtherGrid').datagrid({
                 fit: false,//自动大小  
@@ -130,15 +127,15 @@
                     </tr>
                     <tr>
 
-                        <td align="left" style="padding: 5px;">
-                             月份：
+                        <td align="left" style="padding: 5px;">月份：
                             <input style="width: 80px;" id="sdate" name="sdate" class="Wdate easyui-validatebox" onfocus="WdatePicker({maxDate:'%y-%M',dateFmt:'yyyy-MM',onpicked:pickTable,oncleared:clearTable})"
                                 readonly="readonly" required />
-                            <label for="SalaryOther" style="margin-left:10px;"> 选择薪酬：</label> <input id="SalaryOther" name="SalaryOther" />
+                            <label for="SalaryOther" style="margin-left: 10px;">选择薪酬：</label>
+                            <input id="SalaryOther" name="SalaryOther" />
                             <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-search',plain:false"
                                 onclick="searchGrid();">查询</a>
                             <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:false"
-                                onclick="exportExcel();">导出</a>
+                                onclick="exportOtherExcel();">导出</a>
                         </td>
                     </tr>
                 </table>

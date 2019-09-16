@@ -65,10 +65,10 @@
                 ]
             });
         };
-        var delTableFun = function (name) {
+        var delOtherTableFun = function (name) {
             parent.$.messager.confirm('询问', '您确定要删除该薪酬数据？', function (r) {
                 if (r) {
-                    $.post('../service/Salary.ashx/DelTableByName', {
+                    $.post('../service/Salary.ashx/DelOtherTableByName', {
                         tablename: name
                     }, function (result) {
                         if (result.success) {
@@ -84,28 +84,35 @@
         var salaryOtherTableGrid;
         $(function () {
             salaryOtherTableGrid = $('#salaryOtherTableGrid').datagrid({
-                title: '已导入工资数据',
-                url: '../service/Salary.ashx/GetSalaryTableInfo',
+                title: '已导入薪酬数据表',
+                url: '../service/Salary.ashx/GetSalaryOtherTableInfo',
                 striped: true,
                 rownumbers: true,
                 pagination: true,
                 pageSize: 20,
                 singleSelect: false,
                 noheader: false,
-                idField: 'name',
-                sortName: 'name',
+                idField: 'id',
+                sortName: 'id',
                 sortOrder: 'desc',
                 columns: [[{
+                    width: '120',
+                    title: '月份',
+                    field: 'month',
+                    sortable: true,
+                    halign: 'center',
+                    align: 'center'
+                },{
                     width: '180',
-                    title: '工资表名称',
-                    field: 'name',
+                    title: '薪酬名称',
+                    field: 'salaryname',
                     sortable: true,
                     halign: 'center',
                     align: 'center'
                 }, {
                     width: '160',
                     title: '导入时间',
-                    field: 'crdate',
+                    field: 'inputtime',
                     halign: 'center',
                     align: 'center'
                 }, {
@@ -116,7 +123,7 @@
                     align: 'center',
                     formatter: function (value, row) {
                         var str = '';
-                        str += $.formatString('<img src="../js/easyui/themes/icons/no.png" title="删除" onclick="delTableFun(\'{0}\');"/>', row.name);
+                        str += $.formatString('<img src="../js/easyui/themes/icons/no.png" title="删除" onclick="delOtherTableFun(\'{0}\');"/>', row.tablename);
                         return str;
                     }
                 }]],

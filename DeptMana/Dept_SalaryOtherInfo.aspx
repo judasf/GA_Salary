@@ -49,25 +49,42 @@
                     title: '提示',
                     text: '数据处理中，请稍后....'
                 });
-                $.post('../Service/salary.ashx/GetDeptSalary', $.serializeObject($('#searchForm')), function (result) {
+                $.post('../Service/salary.ashx/GetDeptSalaryOther', $.serializeObject($('#searchForm')), function (result) {
                     parent.$.messager.progress('close');
                     if (result.total >= 1) {
-                        deptsalaryGrid.datagrid({
+                        deptsalaryotherGrid.datagrid({
                             columns: [result.columns]
                         }).datagrid({ loadFilter: pagerFilter }).datagrid("loadData", result.rows);
                     } else {
                         parent.$.messager.alert('提示', '无该月工资数据', 'error');
-                        deptsalaryGrid.datagrid({
+                        deptsalaryotherGrid.datagrid({
                             columns: [[]]
                         }).datagrid("loadData", { rows: [] });
                     }
                 }, 'json');
             }
         };
+        //日期控件选择月份后触发
+        var pickTable = function () {
+            var tm = $dp.cal.getNewDateStr();
+            $.post('../Service/salary.ashx/GetSalaryOtherTableName', { sdate: tm }, function (result) {
+                if (result.total >= 1) {
+                    DeptSalaryOther.combobox("clear").combobox("loadData", result.rows);
+                } else {
+                    parent.$.messager.alert('提示', '该月未导入其他薪酬数据', 'error');
+                    DeptSalaryOther.combobox("clear");
+                }
+            }, 'json');
+
+        }
+        //日期控件清空后触发,清空下拉框
+        var clearTable = function () {
+            DeptSalaryOther.combobox("clear");
+        }
         //导出明细excel
         var exportExcel = function () {
             if ($('#searchForm').form('validate')) {
-                jsPostForm('../service/salary.ashx/ExportDeptSalaryDetail', $.serializeObject($('#searchForm')));
+                jsPostForm('../service/salary.ashx/ExportDeptSalaryOtherDetail', $.serializeObject($('#searchForm')));
             }
         };
         //设置自定义分页
@@ -100,10 +117,19 @@
             data.rows = (data.originalRows.slice(start, end));
             return data;
         }
+        //薪酬下拉列表框
+        var DeptSalaryOther;
         //工资表
-        var deptsalaryGrid;
+        var deptsalaryotherGrid;
         $(function () {
-            deptsalaryGrid = $('#deptsalaryGrid').datagrid({
+            DeptSalaryOther = $('#DeptSalaryOther').combobox({
+                valueField: 'tablename',
+                textField: 'salaryname',
+                panelHeight: 'auto',
+                editable: false,
+                required: true
+            });
+            deptsalaryotherGrid = $('#deptsalaryotherGrid').datagrid({
                 fit: false,//自动大小  
                 rownumbers: false,//行号 
                 singleSelect: false,//单行选取
@@ -128,10 +154,12 @@
                         <td class="search_td">月份： 
                         </td>
                         <td align="left" style="padding: 5px;">
-                            <input style="width: 80px;" name="sdate" class="Wdate easyui-validatebox" onfocus="WdatePicker({maxDate:'%y-%M',dateFmt:'yyyy-MM'})"
+                             <input style="width: 80px;" id="sdate" name="sdate" class="Wdate easyui-validatebox" onfocus="WdatePicker({maxDate:'%y-%M',dateFmt:'yyyy-MM',onpicked:pickTable,oncleared:clearTable})"
                                 readonly="readonly" required />
+                            <label for="DeptSalaryOther" style="margin-left: 10px;">选择薪酬：</label>
+                            <input id="DeptSalaryOther" name="DeptSalaryOther" />
                             <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-search',plain:false"
-                                onclick="searchGrid();">工资查询</a>
+                                onclick="searchGrid();">查询</a>
                             <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-table_go',plain:false"
                                 onclick="exportExcel();">导出</a>
                         </td>
@@ -139,7 +167,7 @@
                 </table>
             </form>
         </div>
-        <table id="deptsalaryGrid">
+        <table id="deptsalaryotherGrid">
         </table>
     </div>
 </body>

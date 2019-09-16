@@ -70,7 +70,7 @@ public class uploadify : IHttpHandler, IRequiresSessionState
             }
             if(fileExtension != ".xls")
             {
-                Response.Write("{\"success\":false,\"msg\":\"文件格式不正确，请选择正确的excel文件！\"}");
+                Response.Write("{\"success\":false,\"msg\":\"文件格式不正确，请选择正确的xls文件！\"}");
                 return;
             }
             if(File.Exists(filePath))

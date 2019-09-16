@@ -237,6 +237,55 @@ public class salary : IHttpHandler, IRequiresSessionState
         Response.Flush();
         Response.End();
     }
+    /// <summary>
+    /// 获取部门其他薪酬信息
+    /// </summary>
+    public void GetDeptSalaryOther()
+    {
+        string sdate = Convert.ToString(Request.Form["sdate"]);
+        string SalaryOtherTable = Convert.ToString(Request.Form["DeptSalaryOther"]);
+        if (sdate.Length != 7)
+        {
+            Response.Write("{\"success\":false,\"msg\":\"月份有误！\"}");
+            return;
+        }
+        //判断当月工资表是否存在
+        DataSet dsshow = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, "SELECT * FROM sysobjects where name = '" + SalaryOtherTable + "' AND type = 'U'");
+        if (dsshow.Tables[0].Rows.Count == 0)
+        {
+            Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
+            return;
+        }
+        string sql = "select c.deptname as [部门名称],b.* FROM dbo.empinfo  a   JOIN   " + SalaryOtherTable + " b ON a.username=b.身份证号码  and a.roleid=0 LEFT JOIN dbo.Department c ON a.deptid=c.DeptID WHERE a.deptid=" + deptId;
+        DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
+        Response.Write(JsonConvert.GetJsonFromDataTableAllColumns(ds, ds.Tables[0].Rows.Count, true));
+    }
+         /// <summary>
+    /// 部门管理员其他薪酬导出
+    /// </summary>
+    public void ExportDeptSalaryOtherDetail()
+    {
+        string sdate = Convert.ToString(Request.Form["sdate"]);
+        string SalaryOtherTable = Convert.ToString(Request.Form["DeptSalaryOther"]);
+        if (sdate.Length != 7)
+        {
+            Response.Write("{\"success\":false,\"msg\":\"工资月份有误！\"}");
+            return;
+        }
+        //判断当月薪酬表是否存在
+        DataSet dsshow = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, "SELECT * FROM sysobjects where name = '" + SalaryOtherTable + "' AND type = 'U'");
+        if (dsshow.Tables[0].Rows.Count == 0)
+        {
+            Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
+            return;
+        }
+        string sql = "select c.deptname as [部门名称],b.* FROM dbo.empinfo  a  JOIN   " + SalaryOtherTable + " b ON a.username=b.身份证号码 LEFT JOIN dbo.Department c ON a.deptid=c.DeptID WHERE a.deptid=" + deptId;
+        DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql.ToString());
+        DataTable dt = ds.Tables[0];
+        ExcelHelper.ExportByWeb(dt, "", sdate + "部门其他薪酬明细.xls", "其他薪酬信息");
+        Response.Flush();
+        Response.End();
+    }
     #endregion
     #region 工资管理员操作
     /// <summary>
@@ -266,7 +315,7 @@ public class salary : IHttpHandler, IRequiresSessionState
     /// <summary>
     /// 获取当月其他薪酬表名
     /// </summary>
-    public void GetSalaryOtherTable()
+    public void GetSalaryOtherTableName()
     {
         string sdate = Convert.ToString(Request.Form["sdate"]);
         if (sdate.Length != 7)
@@ -277,7 +326,7 @@ public class salary : IHttpHandler, IRequiresSessionState
         string where = "";
         where = " where  [month]='" + sdate + "'";
         // int total = 0;
-        string sql = "select salaryname,tablename from  SalaryOtherTables "  + where;
+        string sql = "select salaryname,tablename from  SalaryOtherTables " + where;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
         //Response.Write(JsonConvert.CreateComboboxJson(ds.Tables[0]));
         Response.Write(JsonConvert.GetJsonFromDataTable(ds, ds.Tables[0].Rows.Count, true));
@@ -299,7 +348,6 @@ public class salary : IHttpHandler, IRequiresSessionState
             Response.Write("{\"success\":false,\"msg\":\"月份有误！\"}");
             return;
         }
-        //string tbname = "salaryinfo" + sdate.Replace("-", "");
         //判断当月薪酬表是否存在
         DataSet dsshow = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, "SELECT * FROM sysobjects where name = '" + SalaryOtherTable + "' AND type = 'U'");
         if (dsshow.Tables[0].Rows.Count == 0)
@@ -314,32 +362,27 @@ public class salary : IHttpHandler, IRequiresSessionState
         string sql = "select * from " + SalaryOtherTable + where;
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql);
         Response.Write(JsonConvert.GetJsonFromDataTable(ds, ds.Tables[0].Rows.Count, true));
-
-        //string tableName = "empinfo a  left join roleinfo b on a.roleid=b.roleid  left join department c on a.deptid=c.deptid";
-        //string fieldStr = "*";
-        //DataSet ds = SqlHelper.GetPagination(tbname, fieldStr, Request.Form["sort"].ToString(), Request.Form["order"].ToString(), where, Convert.ToInt32(Request.Form["rows"]), Convert.ToInt32(Request.Form["page"]), out total);
-        //Response.Write(JsonConvert.GetJsonFromDataTable(ds, total,true));
     }
-         /// <summary>
+    /// <summary>
     /// 导入其他薪酬数据
     /// </summary>
-    public void ImportSalaryOntherInfo()
+    public void ImportSalaryOtherInfo()
     {
         string reportPath = "";
         string smonth = Convert.ToString(Request.Form["smonth"]);
         string salaryname = Convert.ToString(Request.Form["salaryname"]);
         if (smonth.Length != 7)
         {
-            Response.Write("{\"success\":false,\"msg\":\"工资月份有误！\"}");
+            Response.Write("{\"success\":false,\"msg\":\"选择月份有误！\"}");
             return;
         }
-         Random myrdn = new Random();//产生随机数
-        string tbname = "salaryOther" + smonth.Replace("-", "")+ myrdn.Next(100);
+        Random myrdn = new Random();//产生随机数
+        string tbname = "salaryOther" + smonth.Replace("-", "") + DateTime.Now.ToString("mmss") + myrdn.Next(100).ToString().PadLeft(2);
         //判断当月工资表是否存在
         DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, "SELECT * FROM sysobjects where name = '" + tbname + "' AND type = 'U'");
         if (ds.Tables[0].Rows.Count == 1)
         {
-            Response.Write("{\"success\":false,\"msg\":\"当月工资表已导入！\"}");
+            Response.Write("{\"success\":false,\"msg\":\"当月此薪酬数据已导入！\"}");
             return;
         }
         if (!string.IsNullOrEmpty(Request.Form["report"]))
@@ -361,15 +404,72 @@ public class salary : IHttpHandler, IRequiresSessionState
         List<int> columnsExists = MyXls.ChkSheetColumns(reportPath, "A", columnsName);
         if (columnsExists.Contains(0))
         {
-            Response.Write("{\"success\":false,\"msg\":\"请检查excel文件内容格式是否正确！\"}");
+            Response.Write("{\"success\":false,\"msg\":\"未检测到“身份证号码”列，请检查excel文件内容格式是否正确！\"}");
             return;
         }
         SqlParameter[] paras = new SqlParameter[]{
+            new SqlParameter("@tablemonth",smonth),
             new SqlParameter("@filePath",reportPath),
+            new SqlParameter("@salaryname",salaryname),
             new SqlParameter("@tableName",tbname)
         };
-        SqlHelper.ExecuteNonQuery(SqlHelper.GetConnection(), CommandType.StoredProcedure, "dbo.ImportSalaryFromExcel", paras);
+        SqlHelper.ExecuteNonQuery(SqlHelper.GetConnection(), CommandType.StoredProcedure, "dbo.ImportSalaryOtherFromExcel", paras);
         Response.Write("{\"success\":true,\"msg\":\"数据导入成功！\"}");
+    }
+    /// <summary>
+    /// 获取已导入薪酬表信息
+    /// </summary>
+    public void GetSalaryOtherTableInfo()
+    {
+        int total = 0;
+        string where = "  ";
+        string tableName = "SalaryOtherTables";
+        string fieldStr = "*";
+        DataSet ds = SqlHelper.GetPagination(tableName, fieldStr, Request.Form["sort"].ToString(), Request.Form["order"].ToString(), where, Convert.ToInt32(Request.Form["rows"]), Convert.ToInt32(Request.Form["page"]), out total);
+        Response.Write(JsonConvert.GetJsonFromDataTable(ds, total));
+    }
+    /// <summary>
+    /// 通过数据表名称删除薪酬数据表
+    /// </summary>
+    public void DelOtherTableByName()
+    {
+        string tablename = Convert.ToString(Request.Form["tablename"]);
+        string sql = "delete from SalaryOtherTables where tablename='" + tablename + "';";
+        sql += "IF EXISTS(SELECT * FROM sysobjects where name = '" + tablename + "' AND type = 'U') ";
+        sql += "begin ";
+        sql += "drop table " + tablename;
+        sql += " end ";
+        int result = SqlHelper.ExecuteNonQuery(SqlHelper.GetConnection(), CommandType.Text, sql);
+        Response.Write("{\"success\":true,\"msg\":\"执行成功\"}");
+    }
+    /// <summary>
+    /// 个人薪酬导出
+    /// </summary>
+    public void ExportSalaryOtherDetail()
+    {
+        string sdate = Convert.ToString(Request.Form["sdate"]);
+        string SalaryOtherTable = Convert.ToString(Request.Form["SalaryOther"]);
+        if (sdate.Length != 7)
+        {
+            Response.Write("{\"success\":false,\"msg\":\"月份有误！\"}");
+            return;
+        }
+        //判断当月薪酬表是否存在
+        DataSet dsshow = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, "SELECT * FROM sysobjects where name = '" + SalaryOtherTable + "' AND type = 'U'");
+        if (dsshow.Tables[0].Rows.Count == 0)
+        {
+            Response.Write("{\"total\":0,\"msg\":\"无数据！\"}");
+            return;
+        }
+        string where = "";
+        if (roleid == 0 || roleid == 2)
+            where = " where [身份证号码]='" + userName + "'";
+        string sql = "select * from " + SalaryOtherTable + where;
+        DataSet ds = SqlHelper.ExecuteDataset(SqlHelper.GetConnection(), CommandType.Text, sql.ToString());
+        DataTable dt = ds.Tables[0];
+        ExcelHelper.ExportByWeb(dt, "", sdate + "其他薪酬明细.xls", "其他薪酬信息");
+        Response.Flush();
+        Response.End();
     }
     #endregion
     public bool IsReusable
