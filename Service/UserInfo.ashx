@@ -110,7 +110,7 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
         int total = 0;
         string where = SetQueryConditionForUserInfo();
         string tableName = "empinfo a  left join roleinfo b on a.roleid=b.roleid  left join department c on a.deptid=c.deptid";
-        string fieldStr = "UID,UserName,realname,deptname,RoleName,a.RoleID,c.deptid";
+        string fieldStr = "UID,UserName,realname,deptname,RoleName,a.RoleID,c.deptid,a.source,a.addtime";
         DataSet ds = SqlHelper.GetPagination(tableName, fieldStr, Request.Form["sort"].ToString(), Request.Form["order"].ToString(), where, Convert.ToInt32(Request.Form["rows"]), Convert.ToInt32(Request.Form["page"]), out total);
         Response.Write(JsonConvert.GetJsonFromDataTable(ds, total));
     }
@@ -158,7 +158,7 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
         paras[4].Value = realName;
         //判断身份证号是否存在
         StringBuilder sql = new StringBuilder("if not exists(select * from empinfo where username=@userName)");
-        sql.Append(" INSERT INTO empinfo values(@userName,@userPwd,@realName,@roleId,@deptId); ");
+        sql.Append(" INSERT INTO empinfo( username, userpwd, realname, roleid, deptid, source,addtime ) values(@userName,@userPwd,@realName,@roleId,@deptId,'管理员添加',getdate()); ");
         /*
         StringBuilder sql = new StringBuilder("if not exists(select * from userinfo where username=@userName)");
         sql.Append(" begin ");
@@ -382,5 +382,47 @@ public class UserInfo : IHttpHandler, IRequiresSessionState
             Response.Write("{\"success\":true,\"msg\":\"执行成功\"}");
         else
             Response.Write("{\"success\":false,\"msg\":\"执行失败！\"}");
+    }
+    /// <summary>
+    /// 批量删除人员
+    /// </summary>
+    public void RemoveBatchUserByIDS()
+    {
+        string ids = Convert.ToString(Request.Form["ids"]);
+        if (ids.Length == 0)
+        {
+            Response.Write("{\"success\":false,\"msg\":\"未选择人员！\"}");
+            return;
+        }
+        string[] arrId = ids.Split(new char[] { ',' });
+        StringBuilder sql = new StringBuilder();
+        List<SqlParameter> paras = new List<SqlParameter>();
+        int i = 0;
+        foreach (string id in arrId)
+        {
+            paras.Add(new SqlParameter("@id" + i.ToString(), id));
+            sql.Append("DELETE FROM empinfo WHERE uid=@id" + i.ToString() + ";");
+            i++;
+        }
+        //使用事务提交操作
+        using (SqlConnection conn = SqlHelper.GetConnection())
+        {
+            conn.Open();
+            using (SqlTransaction trans = conn.BeginTransaction())
+            {
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(trans, CommandType.Text, sql.ToString(), paras.ToArray());
+                    trans.Commit();
+                    Response.Write("{\"success\":true,\"msg\":\"执行成功\"}");
+                }
+                catch
+                {
+                    trans.Rollback();
+                    Response.Write("{\"success\":false,\"msg\":\"执行出错\"}");
+                    throw;
+                }
+            }
+        }
     }
 }

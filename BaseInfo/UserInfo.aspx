@@ -101,6 +101,7 @@
                 }
             });
         };
+       
         //批量设置部门
         var setDept = function () {
             var rows = grid.datagrid('getSelections');
@@ -133,6 +134,33 @@
                 }]
             });
         };
+        //批量删除用户
+        var batchDel = function () {
+            var rows = grid.datagrid('getSelections');
+            var ids = [];
+            if (rows.length == 0) {
+                parent.$.messager.alert('提示', '请选择人员', 'error');
+                return false;
+            }
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                ids.push(row.uid);
+            }
+            parent.$.messager.confirm('询问', '您确定要删除选择人员？', function (r) {
+                if (r) {
+                    $.post('../service/UserInfo.ashx/RemoveBatchUserByIDS', {
+                        ids: ids.join(',')
+                    }, function (result) {
+                        if (result.success) {
+                            grid.datagrid('reload');
+                        } else {
+                            parent.$.messager.alert('提示', result.msg, 'error');
+                        }
+                    }, 'json');
+                }
+            });
+        };
+
         $(function () {
             grid = $('#grid').datagrid({
                 title: '用户管理',
@@ -174,6 +202,20 @@
                     width: '100',
                     title: '角色名',
                     field: 'rolename',
+                    halign: 'center',
+                    align: 'center'
+
+                }, {
+                    width: '120',
+                    title: '来源',
+                    field: 'source',
+                    halign: 'center',
+                    align: 'center'
+
+                }, {
+                    width: '120',
+                    title: '添加时间',
+                    field: 'addtime',
                     halign: 'center',
                     align: 'center'
 
@@ -272,6 +314,10 @@
                             <td>
                                 <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'ext-icon-group',plain:true"
                                     onclick="setDept();">批量设置部门</a>
+                            </td>
+                             <td>
+                                <a href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-cut',plain:true"
+                                    onclick="batchDel();">批量删除</a>
                             </td>
                         </tr>
                     </table>
